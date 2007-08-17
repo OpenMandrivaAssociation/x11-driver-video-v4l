@@ -40,6 +40,6 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %{_libdir}/xorg/modules/drivers/v4l_drv.la
 %{_libdir}/xorg/modules/drivers/v4l_drv.so
-%{_mandir}/man4/v4l.4.bz2
+%{_mandir}/man4/v4l.*
 
 
