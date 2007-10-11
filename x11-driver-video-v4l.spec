@@ -1,6 +1,6 @@
 Name: x11-driver-video-v4l
 Version: 0.1.1
-Release: %mkrel 2
+Release: %mkrel 3
 Summary: Xvideo extension port for video overlay
 Group: Development/X11
 URL: http://xorg.freedesktop.org
@@ -12,7 +12,7 @@ BuildRequires: x11-server-devel >= 1.0.1
 BuildRequires: x11-util-macros >= 1.0.1
 # (tv): v4l need the extmod module
 Requires: x11-server-common
-Conflicts: xorg-x11-server < 7.0
+Conflicts: x11-server < 1.4
 
 %description
 v4l is an Xorg driver for video4linux cards. It provides a Xvideo
@@ -22,9 +22,7 @@ extension port for video overlay.
 %setup -q -n xf86-video-v4l-%{version}
 
 %build
-%configure2_5x	--x-includes=%{_includedir}\
-		--x-libraries=%{_libdir}
-
+%configure2_5x
 %make
 
 %install
