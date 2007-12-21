@@ -4,18 +4,17 @@ Release: %mkrel 4
 Summary: Xvideo extension port for video overlay
 Group: Development/X11
 URL: http://xorg.freedesktop.org
-
+# Note local tag xf86-video-v4l-0.1.1@mandriva suggested on upstream
+# Tag at git checkout 6260e7a8166cefb57c85d3e6aa3ac9f421e2a8b9
 ########################################################################
 # git clone git://git.mandriva.com/people/pcpa/xorg/drivers/xf86-video-v4l  xorg/drivers/xf86-video-v4l
 # cd xorg/drivers/xf86-video/v4l
-# git-archive --format=tar --prefix=xf86-video-v4l-0.1.1/ master | bzip2 -9 > xf86-video-v4l-0.1.1.tar.bz2
+# git-archive --format=tar --prefix=xf86-video-v4l-0.1.1/ xf86-video-v4l-0.1.1@mandriva | bzip2 -9 > xf86-video-v4l-0.1.1.tar.bz2
 ########################################################################
 Source0: xf86-video-v4l-%{version}.tar.bz2
-
 License: MIT
-
 ########################################################################
-# git-format-patch master..origin/mandriva+gpl
+# git-format-patch xf86-video-v4l-0.1.1@mandriva..origin/mandriva+gpl
 Patch1: 0001-Update-for-new-policy-of-hidden-symbols-and-common-m.patch
 ########################################################################
 
