@@ -20,7 +20,6 @@ Patch1: 0001-Update-for-new-policy-of-hidden-symbols-and-common-m.patch
 BuildRequires: x11-proto-devel >= 1.0.0
 BuildRequires: x11-server-devel >= 1.0.1
 BuildRequires: x11-util-macros >= 1.1.5-4mdk
-BuildRequires: x11-util-modular
 # (tv): v4l need the extmod module
 Requires: x11-server-common
 Conflicts: x11-server < 1.4
