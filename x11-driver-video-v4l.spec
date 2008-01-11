@@ -1,3 +1,5 @@
+%define debug_package	%{nil}
+
 Name: x11-driver-video-v4l
 Version: 0.1.1
 Release: %mkrel 4
@@ -17,11 +19,15 @@ License: MIT
 # git-format-patch xf86-video-v4l-0.1.1@mandriva..origin/mandriva+gpl
 Patch1: 0001-Update-for-new-policy-of-hidden-symbols-and-common-m.patch
 ########################################################################
-BuildRequires: x11-proto-devel >= 1.0.0
-BuildRequires: x11-server-devel >= 1.0.1
-BuildRequires: x11-util-macros >= 1.1.5-4mdk
+BuildRequires: x11-util-macros		>= 1.1.5-4mdk
+#BuildRequires: gcc			>= 4.2.2
+#BuildRequires: glibc-devel		>= 2.7
+BuildRequires: libpixman-1-devel	>= 0.9.6
+BuildRequires: x11-proto-devel		>= 7.3
+BuildRequires: x11-server-devel		>= 1.4
+
 # (tv): v4l need the extmod module
-Requires: x11-server-common
+Requires: x11-server-common		>= 1.4
 Conflicts: x11-server < 1.4
 
 %description
