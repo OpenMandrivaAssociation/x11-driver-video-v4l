@@ -1,6 +1,6 @@
 Name: x11-driver-video-v4l
 Version: 0.2.0
-Release: %mkrel 6
+Release: %mkrel 7
 Summary: Xvideo extension port for video overlay
 Group: System/X11
 URL: http://xorg.freedesktop.org
@@ -12,6 +12,7 @@ BuildRequires: x11-server-devel >= 1.0.1
 BuildRequires: x11-util-macros >= 1.0.1
 # (tv): v4l need the extmod module
 Requires: x11-server-common
+Requires: x11-server-common %(xserver-sdk-abi-requires videodrv)
 Conflicts: x11-server < 1.4
 
 %description
