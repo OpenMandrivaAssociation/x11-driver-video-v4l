@@ -1,6 +1,6 @@
 Name: x11-driver-video-v4l
 Version: 0.2.0
-Release: %mkrel 7
+Release: %mkrel 8
 Summary: Xvideo extension port for video overlay
 Group: System/X11
 URL: http://xorg.freedesktop.org
