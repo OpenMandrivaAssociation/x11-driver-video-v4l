@@ -1,12 +1,12 @@
 Name: x11-driver-video-v4l
 Version: 0.2.0
-Release: %mkrel 10
+Release: 11
 Summary: Xvideo extension port for video overlay
 Group: System/X11
+License: MIT
 URL: http://xorg.freedesktop.org
 Source: http://xorg.freedesktop.org/releases/individual/driver/xf86-video-v4l-%{version}.tar.bz2
-License: MIT
-BuildRoot: %{_tmppath}/%{name}-root
+
 BuildRequires: x11-proto-devel >= 1.0.0
 BuildRequires: x11-server-devel >= 1.0.1
 BuildRequires: x11-util-macros >= 1.0.1
@@ -20,7 +20,7 @@ v4l is an Xorg driver for video4linux cards. It provides a Xvideo
 extension port for video overlay.
 
 %prep
-%setup -q -n xf86-video-v4l-%{version}
+%setup -qn xf86-video-v4l-%{version}
 
 %build
 %configure2_5x
@@ -29,13 +29,10 @@ extension port for video overlay.
 %install
 rm -rf %{buildroot}
 %makeinstall_std
-
-%clean
-rm -rf %{buildroot}
+find %{buildroot} -type f -name "*.la" -exec rm -f {} ';'
 
 %files
-%defattr(-,root,root)
 %doc COPYING
-%{_libdir}/xorg/modules/drivers/v4l_drv.la
 %{_libdir}/xorg/modules/drivers/v4l_drv.so
 %{_mandir}/man4/v4l.*
+
