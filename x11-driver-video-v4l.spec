@@ -8,7 +8,7 @@ URL: http://xorg.freedesktop.org
 Source: http://xorg.freedesktop.org/releases/individual/driver/xf86-video-v4l-%{version}.tar.bz2
 
 BuildRequires: x11-proto-devel >= 1.0.0
-BuildRequires: pkgconfig(x11-server) >= 1.13
+BuildRequires: pkgconfig(xorg-server) >= 1.13
 BuildRequires: x11-util-macros >= 1.0.1
 # (tv): v4l need the extmod module
 Requires: x11-server-common
