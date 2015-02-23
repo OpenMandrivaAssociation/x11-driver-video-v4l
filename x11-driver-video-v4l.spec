@@ -7,6 +7,7 @@ License:	MIT
 Url:		http://xorg.freedesktop.org
 Source0:	http://xorg.freedesktop.org/releases/individual/driver/xf86-video-v4l-%{version}.tar.bz2
 Patch0:		xf86-video-v4l-0.2.0-automake1.13-fix.patch
+Patch1:		xf86-video-v4l-0.2.0-build-fix.patch
 
 BuildRequires:	pkgconfig(xorg-macros)
 BuildRequires:	pkgconfig(xorg-server)
@@ -23,7 +24,8 @@ extension port for video overlay.
 autoreconf -fiv
 
 %build
-%configure2_5x
+%define	_disable_ld_no_undefined 1
+%configure
 %make
 
 %install

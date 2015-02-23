@@ -1,0 +1,168 @@
+--- xf86-video-v4l-0.2.0/src/v4l.c.0001~	2008-03-19 21:41:45.000000000 +0100
++++ xf86-video-v4l-0.2.0/src/v4l.c	2015-02-23 14:22:30.849616559 +0100
+@@ -9,10 +9,12 @@
+ 
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#include <sys/ioctl.h>
+ #include <fcntl.h>
+ #include <errno.h>
+ #include <string.h>
+ #include <stdio.h>
++#include <unistd.h>
+ 
+ #include "videodev.h"
+ #include "xf86.h"
+@@ -34,6 +36,10 @@
+ # define DEBUG(x)
+ #endif
+ 
++#ifndef VIDEO_INVERT_CLIPLIST
++#define VIDEO_INVERT_CLIPLIST 0x00000002
++#endif
++
+ static void     V4LIdentify(int flags);
+ static Bool     V4LProbe(DriverPtr drv, int flags);
+ static const OptionInfoRec * V4LAvailableOptions(int chipid, int busid);
+@@ -310,7 +316,7 @@ V4lPutVideo(ScrnInfoPtr pScrn,
+ 		pPPriv->VideoOn = VIDEO_OFF;
+ 		pPPriv->myfmt->stop(pPPriv->surface);
+ 		pPPriv->myfmt->free_surface(pPPriv->surface);
+-		xfree(pPPriv->surface);
++		free(pPPriv->surface);
+ 		pPPriv->surface    = NULL;
+ 	    }
+ 	    pPPriv->yuv_width  = width;
+@@ -318,12 +324,12 @@ V4lPutVideo(ScrnInfoPtr pScrn,
+ 	}
+ 	if (!pPPriv->surface) {
+ 	    /* allocate + setup offscreen surface */
+-	    if (NULL == (pPPriv->surface = xalloc(sizeof(XF86SurfaceRec))))
++	    if (NULL == (pPPriv->surface = malloc(sizeof(XF86SurfaceRec))))
+ 		return FALSE;
+ 	    if (Success != pPPriv->myfmt->alloc_surface
+ 		(pScrn,pPPriv->myfmt->image->id,
+ 		 pPPriv->yuv_width,pPPriv->yuv_height,pPPriv->surface)) {
+-		xfree(pPPriv->surface);
++		free(pPPriv->surface);
+ 		pPPriv->surface = NULL;
+ 		goto fallback_to_rgb;
+ 	    }
+@@ -430,14 +436,14 @@ V4lPutVideo(ScrnInfoPtr pScrn,
+  
+     /* clipping */
+     if (pPPriv->rgb_win.clips) {
+-	xfree(pPPriv->rgb_win.clips);
++	free(pPPriv->rgb_win.clips);
+ 	pPPriv->rgb_win.clips = NULL;
+     }
+     pPPriv->rgb_win.clipcount = REGION_NUM_RECTS(clipBoxes);
+     DEBUG(xf86DrvMsgVerb(pScrn->scrnIndex, X_INFO, 2,"  clip: have #%d\n",
+ 		pPPriv->rgb_win.clipcount));
+     if (0 != pPPriv->rgb_win.clipcount) {
+-	pPPriv->rgb_win.clips = xalloc(pPPriv->rgb_win.clipcount*sizeof(struct video_clip));
++	pPPriv->rgb_win.clips = malloc(pPPriv->rgb_win.clipcount*sizeof(struct video_clip));
+ 	if (NULL != pPPriv->rgb_win.clips) {
+ 	    memset(pPPriv->rgb_win.clips,0,pPPriv->rgb_win.clipcount*sizeof(struct video_clip));
+ 	    pBox = REGION_RECTS(clipBoxes);
+@@ -510,7 +516,7 @@ V4lStopVideo(ScrnInfoPtr pScrn, pointer
+ 	if (VIDEO_YUV == pPPriv->VideoOn) {
+ 	    pPPriv->myfmt->stop(pPPriv->surface);
+ 	    pPPriv->myfmt->free_surface(pPPriv->surface);
+-	    xfree(pPPriv->surface);
++	    free(pPPriv->surface);
+ 	    pPPriv->surface = NULL;
+ 	}
+ 	if (-1 == ioctl(V4L_FD, VIDIOCCAPTURE, &zero))
+@@ -715,7 +721,7 @@ v4l_add_enc(XF86VideoEncodingPtr enc, in
+ 	    char *norm, char *input, int width, int height, int n, int d)
+ {
+     enc[i].id     = i;
+-    enc[i].name   = xalloc(strlen(norm)+strlen(input)+2);
++    enc[i].name   = malloc(strlen(norm)+strlen(input)+2);
+     if (NULL == enc[i].name)
+ 	return -1;
+     enc[i].width  = width;
+@@ -738,15 +744,15 @@ V4LBuildEncodings(PortPrivPtr p, int fd,
+ 	have_bttv = 1;
+ 	
+     entries = (have_bttv ? 7 : 3) * channels;
+-    p->enc = xalloc(sizeof(XF86VideoEncodingRec) * entries);
++    p->enc = malloc(sizeof(XF86VideoEncodingRec) * entries);
+     if (NULL == p->enc)
+ 	goto fail;
+     memset(p->enc,0,sizeof(XF86VideoEncodingRec) * entries);
+-    p->norm = xalloc(sizeof(int) * entries);
++    p->norm = malloc(sizeof(int) * entries);
+     if (NULL == p->norm)
+ 	goto fail;
+     memset(p->norm,0,sizeof(int) * entries);
+-    p->input = xalloc(sizeof(int) * entries);
++    p->input = malloc(sizeof(int) * entries);
+     if (NULL == p->input)
+ 	goto fail;
+     memset(p->input,0,sizeof(int) * entries);
+@@ -812,13 +818,13 @@ V4LBuildEncodings(PortPrivPtr p, int fd,
+     
+  fail:
+     if (p->input)
+-	xfree(p->input);
++	free(p->input);
+     p->input = NULL;
+     if (p->norm)
+-	xfree(p->norm);
++	free(p->norm);
+     p->norm = NULL;
+     if (p->enc)
+-	xfree(p->enc);
++	free(p->enc);
+     p->enc = NULL;
+     p->nenc = 0;
+ }
+@@ -839,7 +845,7 @@ v4l_add_attr(XF86AttributeRec **list, in
+     }
+     
+     DEBUG(xf86Msg(X_INFO, "v4l: add attr %s\n",attr->name));
+-    *list = xalloc((*count + 1) * sizeof(XF86AttributeRec));
++    *list = malloc((*count + 1) * sizeof(XF86AttributeRec));
+     if (NULL == *list) {
+ 	*count = 0;
+ 	return;
+@@ -918,7 +924,7 @@ V4LInit(ScrnInfoPtr pScrn, XF86VideoAdap
+ 	DEBUG(xf86Msg(X_INFO,  "v4l: %s open ok\n",dev));
+ 
+ 	/* our private data */
+-	pPPriv = xalloc(sizeof(PortPrivRec));
++	pPPriv = malloc(sizeof(PortPrivRec));
+ 	if (!pPPriv)
+ 	    return FALSE;
+ 	memset(pPPriv,0,sizeof(PortPrivRec));
+@@ -928,7 +934,7 @@ V4LInit(ScrnInfoPtr pScrn, XF86VideoAdap
+ 	if (-1 == ioctl(fd,VIDIOCGCAP,&pPPriv->cap) ||
+ 	    0 == (pPPriv->cap.type & VID_TYPE_OVERLAY)) {
+ 	    DEBUG(xf86Msg(X_INFO,  "v4l: %s: no overlay support\n",dev));
+-	    xfree(pPPriv);
++	    free(pPPriv);
+ 	    close(fd);
+ 	    continue;
+ 	}
+@@ -939,8 +945,8 @@ V4LInit(ScrnInfoPtr pScrn, XF86VideoAdap
+ 	v4l_check_yuv(pScrn,pPPriv,dev,fd);
+ 	
+ 	/* alloc VideoAdaptorRec */
+-	VAR = xrealloc(VAR,sizeof(XF86VideoAdaptorPtr)*(i+1));
+-	VAR[i] = xalloc(sizeof(XF86VideoAdaptorRec));
++	VAR = realloc(VAR,sizeof(XF86VideoAdaptorPtr)*(i+1));
++	VAR[i] = malloc(sizeof(XF86VideoAdaptorRec));
+ 	if (!VAR[i])
+ 	    return FALSE;
+ 	memset(VAR[i],0,sizeof(XF86VideoAdaptorRec));
+@@ -976,7 +982,7 @@ V4LInit(ScrnInfoPtr pScrn, XF86VideoAdap
+ 	
+ 	
+ 	/* hook in private data */
+-	Private = xalloc(sizeof(DevUnion));
++	Private = malloc(sizeof(DevUnion));
+ 	if (!Private)
+ 	    return FALSE;
+ 	memset(Private,0,sizeof(DevUnion));
