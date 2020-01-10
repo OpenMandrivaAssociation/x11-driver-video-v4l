@@ -18,7 +18,7 @@ extension port for video overlay.
 
 %prep
 %setup -qn xf86-video-v4l-%{version}
-%apply_patches
+%autopatch -p1
 autoreconf -fiv
 
 %build
